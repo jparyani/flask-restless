@@ -1135,13 +1135,14 @@ class API(ModelView):
             self.session.commit()
             result = self._inst_to_dict(instance)
 
-            for postprocessor in self.postprocessors['POST']:
-                postprocessor(result=result)
-
             # The URL at which a client can access the newly created instance
             # of the model.
             primary_key = primary_key_name(instance)
             url = '%s/%s' % (request.base_url, result[primary_key])
+
+            for postprocessor in self.postprocessors['POST']:
+                postprocessor(result=result)
+
             # Provide that URL in the Location header in the response.
             headers = dict(Location=url)
             return jsonify_status_code(201, headers=headers, **result)
